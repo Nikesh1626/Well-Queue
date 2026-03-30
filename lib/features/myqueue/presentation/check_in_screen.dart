@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/services/queue_service.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/models/queue_entry.dart';
 
 class CheckInScreen extends StatefulWidget {
   const CheckInScreen({super.key});
@@ -58,12 +57,12 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                    color: const Color(0xFFD8EFEA),
                   ),
                   child: Icon(
                     Icons.queue_outlined,
                     size: 64,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: const Color(0xFF00695C),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -96,19 +95,36 @@ class _CheckInScreenState extends State<CheckInScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     Text(queue.clinicName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
-                    Text(
-                      '${queue.position}',
-                      style: const TextStyle(fontSize: 64, fontWeight: FontWeight.w900, color: Colors.teal),
+                    Container(
+                      width: 170,
+                      height: 170,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF00695C),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF00695C).withValues(alpha: 0.18),
+                            blurRadius: 24,
+                            spreadRadius: 8,
+                          )
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '#Q${queue.position}',
+                        style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white),
+                      ),
                     ),
                     const Text('Current Position', style: TextStyle(color: Colors.grey)),
                     const SizedBox(height: 10),
-                    Text('Status: ${_statusText(queue.status)}'),
+                    Text('Status: ${_statusText(queue.status)}', style: const TextStyle(fontWeight: FontWeight.w600)),
                     Text('Estimated wait: ${queue.estimatedWaitMinutes} min'),
                   ],
                 ),
@@ -119,7 +135,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
               onPressed: () async {
                 await context.read<QueueService>().cancelQueue(queue.id);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFB92D2D)),
               child: const Text('Leave Queue'),
             ),
           ],

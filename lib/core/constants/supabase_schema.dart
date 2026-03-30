@@ -1,5 +1,4 @@
-/// Supabase Database Schema Constants
-/// Defines all table names and column names for consistency
+// Supabase Database Schema constants for table and column names.
 
 class SupabaseSchema {
   // Table Names

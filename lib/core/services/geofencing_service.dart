@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/supabase_schema.dart';
 
 class GeofencingService extends ChangeNotifier {
   static final GeofencingService _instance = GeofencingService._internal();
@@ -14,7 +13,6 @@ class GeofencingService extends ChangeNotifier {
   GeofencingService._internal();
 
   static const double _geofenceRadiusMeters = 50.0;
-  static const int _checkIntervalSeconds = 10;
 
   StreamSubscription<Position>? _positionStream;
   bool _isMonitoring = false;

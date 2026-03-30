@@ -101,104 +101,110 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Clinic Details'),
-      ),
+      appBar: AppBar(title: const Text('Clinic Details')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Clinic Header
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            Container(
+              height: 230,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF9FD1D3), Color(0xFF567C84)],
+                ),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Row(
                   children: [
-                    Text(
-                      widget.clinic.name,
-                      style: Theme.of(context).textTheme.headlineSmall,
+                    Container(
+                      width: 58,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(29),
+                      ),
+                      child: const Icon(Icons.call, color: Color(0xFF00695C)),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 20),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${widget.clinic.rating.toStringAsFixed(1)} / 5.0',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 58,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(29),
+                      ),
+                      child: const Icon(Icons.near_me, color: Color(0xFF00695C)),
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Address Section
-            Text(
-              'Address',
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.clinic.name,
+                    style: const TextStyle(fontSize: 46, fontWeight: FontWeight.w700, height: 1.05),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD7EAF6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text('Open until 8:00 PM', style: TextStyle(fontWeight: FontWeight.w600)),
+                )
+              ],
             ),
             const SizedBox(height: 8),
-            Text(widget.clinic.address),
+            Text(widget.clinic.address, style: const TextStyle(fontSize: 22, color: Color(0xFF536872))),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: widget.clinic.services
+                  .map((s) => Chip(label: Text(s), backgroundColor: const Color(0xFFEFF3F4), side: BorderSide.none))
+                  .toList(),
+            ),
             const SizedBox(height: 16),
 
-            // Wait Time Section
-            Text(
-              'Current Wait Time',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.all(12),
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(28),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF00695C), Color(0xFF0A8072)],
+                ),
               ),
-              child: Text(
-                '${widget.clinic.waitTimeMinutes} minutes',
-                style: Theme.of(context).textTheme.headlineSmall,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('CURRENT WAIT TIME', style: TextStyle(color: Colors.white70, letterSpacing: 1.4)),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${widget.clinic.waitTimeMinutes} min',
+                    style: const TextStyle(fontSize: 62, color: Colors.white, fontWeight: FontWeight.w700),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
 
-            // Services Section
-            if (widget.clinic.services.isNotEmpty) ...[
-              Text(
-                'Services',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: widget.clinic.services
-                    .map(
-                      (service) => Chip(label: Text(service)),
-                    )
-                    .toList(),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Contact Section
-            if (widget.clinic.phone != null) ...[
-              Text(
-                'Contact',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              ListTile(
-                leading: const Icon(Icons.phone),
-                title: Text(widget.clinic.phone!),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Geofence Option
             Card(
+              color: Colors.white,
               child: CheckboxListTile(
                 title: const Text('Join queue when I arrive (50m radius)'),
                 subtitle: const Text('Enable geofencing'),
@@ -212,10 +218,9 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Action Buttons
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 58,
               child: ElevatedButton(
                 onPressed: _joinQueue,
                 child: const Text('Join Queue'),
@@ -224,13 +229,14 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 58,
               child: ElevatedButton.icon(
                 onPressed: _triggerAICall,
                 icon: const Icon(Icons.phone),
                 label: const Text('Call AI Booking Agent'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: const Color(0xFF0B7A3C),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                 ),
               ),
             ),

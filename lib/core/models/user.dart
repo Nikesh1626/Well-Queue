@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class AppUser {
   final String id;
   final String email;

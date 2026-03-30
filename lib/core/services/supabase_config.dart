@@ -16,6 +16,6 @@ class SupabaseConfig {
   }
 
   static SupabaseClient get client => Supabase.instance.client;
-  static get auth => client.auth;
-  static get realtime => client.realtime;
+  static GoTrueClient get auth => client.auth;
+  static RealtimeClient get realtime => client.realtime;
 }

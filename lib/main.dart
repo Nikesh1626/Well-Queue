@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/services/supabase_config.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/queue_service.dart';
 import 'core/services/clinic_service.dart';
 import 'core/services/geofencing_service.dart';
+import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/auth_screen.dart';
 import 'features/location_access/presentation/location_access_screen.dart';
 
@@ -15,9 +15,9 @@ void main() async {
   try {
     // Initialize Supabase
     await SupabaseConfig.initialize();
-    print('Supabase initialized successfully');
+    debugPrint('Supabase initialized successfully');
   } catch (e) {
-    print('Error initializing Supabase: $e');
+    debugPrint('Error initializing Supabase: $e');
   }
 
   runApp(const MyApp());
@@ -40,11 +40,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GeofencingService()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'WellQueue',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
+        theme: AppTheme.light,
         home: const _AppRouter(),
       ),
     );

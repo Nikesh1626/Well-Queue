@@ -48,66 +48,54 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
+        title: const Row(
+          children: [
+            Icon(Icons.spa_rounded, color: Color(0xFF00695C)),
+            SizedBox(width: 8),
+            Text('WellQueue'),
+          ],
+        ),
+        centerTitle: false,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.teal.shade400, Colors.teal.shade600],
+            const SizedBox(height: 20),
+            CircleAvatar(
+              radius: 62,
+              backgroundColor: Colors.white,
+              child: Text(
+                initials,
+                style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w700, color: Color(0xFF00695C)),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              user.fullName,
+              style: const TextStyle(fontSize: 52, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(user.email, style: const TextStyle(color: Color(0xFF5A7078), fontSize: 17)),
+            const SizedBox(height: 22),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const CircleAvatar(backgroundColor: Color(0xFFD8ECEE), child: Icon(Icons.phone, color: Color(0xFF4B616B))),
+                      title: const Text('Phone', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(user.phone ?? '-'),
+                    ),
+                    ListTile(
+                      leading: const CircleAvatar(backgroundColor: Color(0xFFD8ECEE), child: Icon(Icons.cake, color: Color(0xFF4B616B))),
+                      title: const Text('Age', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(user.age?.toString() ?? '-'),
+                    ),
+                  ],
                 ),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 40),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      initials,
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal.shade700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    user.fullName,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    user.email,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.phone),
-              title: const Text('Phone'),
-              subtitle: Text(user.phone ?? '-'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cake),
-              title: const Text('Age'),
-              subtitle: Text(user.age?.toString() ?? '-'),
             ),
             const SizedBox(height: 16),
             Padding(
@@ -117,8 +105,8 @@ class ProfileScreen extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _handleLogout(context),
                   icon: const Icon(Icons.logout),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  label: const Text('Logout'),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD44E4E)),
+                  label: const Text('Sign Out'),
                 ),
               ),
             ),

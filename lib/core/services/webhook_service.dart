@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 
 class WebhookService {
@@ -35,12 +36,12 @@ class WebhookService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 202) {
-        print('AI call triggered successfully');
+        debugPrint('AI call triggered successfully');
       } else {
-        print('Webhook response: ${response.statusCode} - ${response.data}');
+        debugPrint('Webhook response: ${response.statusCode} - ${response.data}');
       }
     } catch (e) {
-      print('Error triggering AI call: $e');
+      debugPrint('Error triggering AI call: $e');
       rethrow;
     }
   }
@@ -69,9 +70,9 @@ class WebhookService {
         data: payload,
       );
 
-      print('Appointment booking triggered via AI');
+      debugPrint('Appointment booking triggered via AI');
     } catch (e) {
-      print('Error booking appointment via AI: $e');
+      debugPrint('Error booking appointment via AI: $e');
       rethrow;
     }
   }
@@ -94,9 +95,9 @@ class WebhookService {
         data: payload,
       );
 
-      print('SMS notification sent');
+      debugPrint('SMS notification sent');
     } catch (e) {
-      print('Error sending SMS notification: $e');
+      debugPrint('Error sending SMS notification: $e');
       rethrow;
     }
   }

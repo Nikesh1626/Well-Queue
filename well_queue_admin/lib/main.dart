@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/services/supabase_config.dart';
 import 'core/services/auth_service.dart';
+import 'core/theme/admin_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 
@@ -21,10 +22,7 @@ class AdminApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'WellQueue Clinic Admin',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-          useMaterial3: true,
-        ),
+        theme: AdminTheme.light,
         home: const _AdminRouter(),
       ),
     );

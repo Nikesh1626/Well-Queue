@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../home/presentation/home_screen.dart';
 
-const Color _primaryColor = Color(0xFF1B5E20);
-const Color _accentColor = Color(0xFFC8E6C9);
+const Color _primaryColor = Color(0xFF00695C);
 
 class LocationAccessScreen extends StatelessWidget {
   const LocationAccessScreen({super.key});
@@ -115,114 +114,115 @@ class LocationAccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF4F8F8),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 32),
-              const Text(
-                'WellQueue',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Find local clinics and see live wait times.',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 40),
-              const Text(
-                'Location',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 20),
+              const Row(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Enable Location Access',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Allow WellQueue to access your location to find nearby clinics.',
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () => _enableLocationAccess(context),
-                          icon: const Icon(Icons.arrow_forward, size: 16),
-                          label: const Text('Enable'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 90,
-                    height: 90,
-                    margin: const EdgeInsets.only(left: 16),
-                    decoration: BoxDecoration(
-                      color: _accentColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _primaryColor.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.location_on_sharp,
-                        size: 50,
-                        color: _primaryColor,
-                      ),
-                    ),
+                  Icon(Icons.spa_rounded, color: _primaryColor, size: 30),
+                  SizedBox(width: 10),
+                  Text(
+                    'WellQueue',
+                    style: TextStyle(fontSize: 34, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => _enterLocationManually(context),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.black87,
-                    side: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 28,
+                        spreadRadius: -8,
+                        offset: const Offset(0, 16),
+                      ),
+                    ],
                   ),
-                  child: const Text(
-                    'Enter Location Manually',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        height: 170,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          color: const Color(0xFFEAF2F1),
+                        ),
+                        child: const Icon(
+                          Icons.map_outlined,
+                          size: 68,
+                          color: Color(0xFF7AA7A0),
+                        ),
+                      ),
+                      const SizedBox(height: 26),
+                      const Text(
+                        'Find Care Nearby',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          height: 1.05,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'WellQueue uses your location to find clinics with the shortest wait times around you.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 17, color: Color(0xFF536872), height: 1.35),
+                      ),
+                      const SizedBox(height: 28),
+                      ElevatedButton(
+                        onPressed: () => _enableLocationAccess(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          minimumSize: const Size(double.infinity, 58),
+                        ),
+                        child: const Text(
+                          'Allow Location',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      ,
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF3F4),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.lock, color: Color(0xFF536872)),
+                            SizedBox(width: 10),
+                            Text(
+                              'YOUR DATA IS PRIVATE & SECURE',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF536872),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

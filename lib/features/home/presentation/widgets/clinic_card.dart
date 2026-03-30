@@ -19,7 +19,8 @@ class ClinicCard extends StatelessWidget {
       },
       child: Card(
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -27,31 +28,61 @@ class ClinicCard extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD2E8EE),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.local_hospital, color: Color(0xFF00695C)),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       clinic.name,
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   Container(
-                    width: 10,
-                    height: 10,
-                    decoration: const BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE5F6EF),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Text(
+                      'OPEN',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF00695C),
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 10),
               Row(
                 children: [
+                  const Icon(Icons.location_on, size: 16, color: Color(0xFF5A7078)),
+                  const SizedBox(width: 3),
                   Text(
-                    '${(clinic.distance ?? 0).toStringAsFixed(1)} km · ${clinic.waitTimeMinutes} min wait',
-                    style: const TextStyle(color: Colors.grey),
+                    '${(clinic.distance ?? 0).toStringAsFixed(1)} km',
+                    style: const TextStyle(color: Color(0xFF5A7078)),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('•', style: TextStyle(color: Color(0xFF5A7078))),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${clinic.waitTimeMinutes} min wait',
+                    style: TextStyle(
+                      color: clinic.waitTimeMinutes > 30
+                          ? const Color(0xFFBC7B00)
+                          : const Color(0xFF00695C),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const Spacer(),
                   Row(
@@ -69,22 +100,24 @@ class ClinicCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 clinic.address,
                 style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
+                  color: const Color(0xFF60757D),
+                  fontSize: 13,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: clinic.services.map((service) {
                   return Chip(
                     label: Text(service),
-                    backgroundColor: Colors.grey[200],
+                    labelStyle: const TextStyle(fontSize: 12),
+                    backgroundColor: const Color(0xFFEFF3F4),
+                    side: BorderSide.none,
                   );
                 }).toList(),
               ),

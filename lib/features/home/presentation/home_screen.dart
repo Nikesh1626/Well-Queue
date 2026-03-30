@@ -43,18 +43,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Find Care'),
+        title: const Row(
+          children: [
+            Icon(Icons.spa_rounded, color: Color(0xFF00695C)),
+            SizedBox(width: 8),
+            Text('WellQueue', style: TextStyle(fontWeight: FontWeight.w700)),
+          ],
+        ),
         centerTitle: false,
       ),
       body: _getCurrentWidget(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: const Color(0xFF00695C),
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'My Queue'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.hourglass_bottom_rounded), label: 'My Queue'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
@@ -120,27 +126,27 @@ class _HomeContentState extends State<_HomeContent> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const CustomSearchBar(),
           const SizedBox(height: 16),
           Container(
-            height: 200,
+            height: 320,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.3),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 26,
+                  spreadRadius: -8,
+                  offset: const Offset(0, 12),
                 ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(28),
               child: _isLoadingLocation
                   ? const Center(child: CircularProgressIndicator())
                   : _currentLocation == null
@@ -165,25 +171,25 @@ class _HomeContentState extends State<_HomeContent> {
                                   height: 40,
                                   child: const Icon(
                                     Icons.location_on,
-                                    color: Colors.red,
+                                    color: Color(0xFFBC1F1F),
                                     size: 40,
                                   ),
                                 ),
                                 ..._nearbyClinics.map(
                                   (clinic) => Marker(
                                     point: LatLng(clinic.latitude, clinic.longitude),
-                                    width: 30,
-                                    height: 30,
+                                    width: 38,
+                                    height: 38,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.teal,
-                                        borderRadius: BorderRadius.circular(15),
-                                        border: Border.all(color: Colors.white, width: 2),
+                                        color: const Color(0xFF00695C),
+                                        borderRadius: BorderRadius.circular(19),
+                                        border: Border.all(color: Colors.white, width: 2.5),
                                       ),
                                       child: const Icon(
                                         Icons.local_hospital,
                                         color: Colors.white,
-                                        size: 20,
+                                        size: 21,
                                       ),
                                     ),
                                   ),
@@ -195,11 +201,14 @@ class _HomeContentState extends State<_HomeContent> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Nearby Clinics',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Clinics nearby', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700)),
+              Text('View all', style: TextStyle(fontSize: 18, color: Color(0xFF00695C), fontWeight: FontWeight.w600)),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           const NearbyClinicsList(),
         ],
       ),

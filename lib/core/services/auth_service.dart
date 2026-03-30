@@ -149,14 +149,22 @@ class AuthService extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
+      final updates = <String, dynamic>{
+        SupabaseSchema.userFirstName: firstName,
+        SupabaseSchema.userLastName: lastName,
+        SupabaseSchema.userPhone: phone,
+        SupabaseSchema.userAge: age,
+        SupabaseSchema.userUpdatedAt: DateTime.now().toIso8601String(),
+      }
+        ..removeWhere(
+          (key, value) =>
+              (key == SupabaseSchema.userPhone ||
+                  key == SupabaseSchema.userAge) &&
+              value == null,
+        );
+
       await _supabase.from(SupabaseSchema.usersTable).update(
-        {
-          SupabaseSchema.userFirstName: firstName,
-          SupabaseSchema.userLastName: lastName,
-          if (phone != null) SupabaseSchema.userPhone: phone,
-          if (age != null) SupabaseSchema.userAge: age,
-          SupabaseSchema.userUpdatedAt: DateTime.now().toIso8601String(),
-        },
+        updates,
       ).eq(SupabaseSchema.userId, _currentUser!.id);
 
       // Reload user profile
