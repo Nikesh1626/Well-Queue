@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/services/auth_service.dart';
-import 'admin_signup_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -26,7 +25,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   static const Color surfaceContainerLow = Color(0xFFF2F4F5);
   static const Color onSurface = Color(0xFF191c1d);
   static const Color secondary = Color(0xFF4c616c);
-  static const Color outlineVariant = Color(0xFFBDC9C5);
 
   @override
   void dispose() {
@@ -289,7 +287,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                               const SizedBox(height: 12),
                               TextButton(
                                 onPressed: () => Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (_) => const AdminSignupScreen()),
+                                  MaterialPageRoute(builder: (_) => const _InlineAdminSignupScreen()),
                                 ),
                                 child: const Text(
                                   'Create Admin Profile',
@@ -311,6 +309,102 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _InlineAdminSignupScreen extends StatefulWidget {
+  const _InlineAdminSignupScreen();
+
+  @override
+  State<_InlineAdminSignupScreen> createState() => _InlineAdminSignupScreenState();
+}
+
+class _InlineAdminSignupScreenState extends State<_InlineAdminSignupScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _firstName = TextEditingController();
+  final _lastName = TextEditingController();
+  final _clinicName = TextEditingController();
+  final _clinicAddress = TextEditingController();
+  final _clinicEmail = TextEditingController();
+  final _password = TextEditingController();
+  final _confirmPassword = TextEditingController();
+
+  @override
+  void dispose() {
+    _firstName.dispose();
+    _lastName.dispose();
+    _clinicName.dispose();
+    _clinicAddress.dispose();
+    _clinicEmail.dispose();
+    _password.dispose();
+    _confirmPassword.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final auth = context.read<AdminAuthService>();
+    final ok = await auth.createAdminProfile(
+      firstName: _firstName.text.trim(),
+      lastName: _lastName.text.trim(),
+      clinicName: _clinicName.text.trim(),
+      clinicAddress: _clinicAddress.text.trim(),
+      latitude: 0,
+      longitude: 0,
+      clinicEmail: _clinicEmail.text.trim(),
+      password: _password.text,
+    );
+
+    if (!mounted) return;
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Admin profile created. Please sign in.')),
+      );
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(auth.error ?? 'Failed to create admin profile')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AdminAuthService>();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Create Admin Profile')),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            TextFormField(controller: _firstName, decoration: const InputDecoration(labelText: 'First Name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'First name is required' : null),
+            const SizedBox(height: 12),
+            TextFormField(controller: _lastName, decoration: const InputDecoration(labelText: 'Last Name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Last name is required' : null),
+            const SizedBox(height: 12),
+            TextFormField(controller: _clinicName, decoration: const InputDecoration(labelText: 'Clinic Name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Clinic name is required' : null),
+            const SizedBox(height: 12),
+            TextFormField(controller: _clinicAddress, decoration: const InputDecoration(labelText: 'Clinic Address'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Clinic address is required' : null),
+            const SizedBox(height: 12),
+            TextFormField(controller: _clinicEmail, decoration: const InputDecoration(labelText: 'Clinic Email'), validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Email is required';
+              final okEmail = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v.trim());
+              return okEmail ? null : 'Please enter a valid email';
+            }),
+            const SizedBox(height: 12),
+            TextFormField(controller: _password, obscureText: true, decoration: const InputDecoration(labelText: 'Password'), validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null),
+            const SizedBox(height: 12),
+            TextFormField(controller: _confirmPassword, obscureText: true, decoration: const InputDecoration(labelText: 'Confirm Password'), validator: (v) => v != _password.text ? 'Passwords do not match' : null),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: auth.loading ? null : _submit,
+              child: Text(auth.loading ? 'Creating...' : 'Create Admin Account'),
+            ),
+          ],
+        ),
       ),
     );
   }
