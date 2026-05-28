@@ -24,6 +24,26 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   bool _showPassword = false;
 
+  bool get _isCompact => MediaQuery.sizeOf(context).width < 390;
+  double get _outerPadding => _isCompact ? 16 : 24;
+  double get _cardRadius => _isCompact ? 24 : 32;
+  double get _buttonHeight => _isCompact ? 52 : 56;
+
+  void _setAuthState(AuthState next) {
+    if (_authState == next) return;
+    _formKey.currentState?.reset();
+    _emailController.clear();
+    _passwordController.clear();
+    if (next != AuthState.signup) {
+      _firstNameController.clear();
+      _lastNameController.clear();
+    }
+    setState(() {
+      _authState = next;
+      _showPassword = false;
+    });
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -42,25 +62,23 @@ class _AuthScreenState extends State<AuthScreen> {
   static const Color surfaceContainerLow = Color(0xFFF2F4F5);
   static const Color onSurface = Color(0xFF191c1d);
   static const Color secondary = Color(0xFF4c616c);
-  static const Color outlineVariant = Color(0xFFBDC9C5);
-
   Widget _buildAuthHeader(String title, String subtitle) {
     return Column(
       children: [
         Container(
-          width: 64,
-          height: 64,
+          width: _isCompact ? 56 : 64,
+          height: _isCompact ? 56 : 64,
           decoration: BoxDecoration(
             color: primaryContainer,
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(_isCompact ? 28 : 32),
           ),
-          child: const Icon(Icons.spa_rounded, size: 32, color: Colors.white),
+          child: Icon(Icons.local_hospital, size: _isCompact ? 28 : 32, color: Colors.white),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: _isCompact ? 18 : 24),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 28,
+          style: TextStyle(
+            fontSize: _isCompact ? 24 : 28,
             fontWeight: FontWeight.w800,
             height: 1.05,
             color: onSurface,
@@ -71,15 +89,15 @@ class _AuthScreenState extends State<AuthScreen> {
         const SizedBox(height: 8),
         Text(
           subtitle,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: _isCompact ? 14 : 16,
             color: secondary,
             height: 1.35,
             fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: _isCompact ? 24 : 32),
       ],
     );
   }
@@ -96,18 +114,18 @@ class _AuthScreenState extends State<AuthScreen> {
       filled: true,
       fillColor: surfaceContainerLow,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_isCompact ? 14 : 16),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_isCompact ? 14 : 16),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_isCompact ? 14 : 16),
         borderSide: const BorderSide(color: primaryFixed, width: 2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: _isCompact ? 14 : 16),
       suffixIcon: suffixIcon,
     );
   }
@@ -199,7 +217,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: primaryFixed.withOpacity(0.15),
+                      color: primaryFixed.withValues(alpha: 0.15),
                     ),
                   ),
                 ),
@@ -211,7 +229,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 400,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFCFE6F2).withOpacity(0.2),
+                      color: const Color(0xFFCFE6F2).withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -224,11 +242,11 @@ class _AuthScreenState extends State<AuthScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(_outerPadding),
               child: Container(
                 decoration: BoxDecoration(
                   color: surfaceContainerLowest,
-                  borderRadius: BorderRadius.circular(32),
+                  borderRadius: BorderRadius.circular(_cardRadius),
                   boxShadow: [
                     BoxShadow(
                       color: onSurface.withAlpha((0.04 * 255).toInt()),
@@ -237,16 +255,16 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                padding: EdgeInsets.symmetric(horizontal: _isCompact ? 20 : 32, vertical: _isCompact ? 28 : 48),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildAuthHeader('WellQueue', 'Your restorative care journey begins here.'),
-                    const SizedBox(height: 40),
+                    SizedBox(height: _isCompact ? 26 : 40),
                     // Feature preview card
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(_isCompact ? 18 : 24),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           begin: Alignment(0, -1),
@@ -260,8 +278,8 @@ class _AuthScreenState extends State<AuthScreen> {
                         children: [
                           Text(
                             'Real-time wait times',
-                            style: const TextStyle(
-                              fontSize: 14,
+                            style: TextStyle(
+                              fontSize: _isCompact ? 13 : 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                               letterSpacing: 0.5,
@@ -271,17 +289,17 @@ class _AuthScreenState extends State<AuthScreen> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.95),
+                              color: Colors.white.withValues(alpha: 0.95),
                               borderRadius: BorderRadius.circular(24),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(Icons.hourglass_bottom, color: primary, size: 28),
-                                SizedBox(width: 12),
+                                const Icon(Icons.hourglass_bottom, color: primary, size: 28),
+                                const SizedBox(width: 12),
                                 Text(
                                   'Approx. 4 mins',
                                   style: TextStyle(
-                                    fontSize: 22,
+                                    fontSize: _isCompact ? 19 : 22,
                                     fontWeight: FontWeight.w700,
                                     color: onSurface,
                                   ),
@@ -292,10 +310,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: _isCompact ? 26 : 40),
                     // Primary button with gradient
                     SizedBox(
-                      height: 56,
+                      height: _buttonHeight,
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -306,14 +324,14 @@ class _AuthScreenState extends State<AuthScreen> {
                           borderRadius: BorderRadius.circular(28),
                           boxShadow: [
                             BoxShadow(
-                              color: primary.withOpacity(0.3),
+                                color: primary.withValues(alpha: 0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () => setState(() => _authState = AuthState.signup),
+                          onPressed: () => _setAuthState(AuthState.signup),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
@@ -323,8 +341,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           child: const Text(
                             'Get Started',
-                            style: TextStyle(
-                              fontSize: 16,
+                              style: TextStyle(
+                                fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                               letterSpacing: 0.5,
@@ -336,7 +354,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 16),
                     // Secondary button
                     TextButton(
-                      onPressed: () => setState(() => _authState = AuthState.login),
+                      onPressed: () => _setAuthState(AuthState.login),
                       child: const Text(
                         'Log In',
                         style: TextStyle(
@@ -373,7 +391,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: primaryFixed.withOpacity(0.15),
+                      color: primaryFixed.withValues(alpha: 0.15),
                     ),
                   ),
                 ),
@@ -385,7 +403,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 400,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFCFE6F2).withOpacity(0.2),
+                      color: const Color(0xFFCFE6F2).withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -400,20 +418,20 @@ class _AuthScreenState extends State<AuthScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(_outerPadding),
                 child: Container(
                   decoration: BoxDecoration(
                     color: surfaceContainerLowest,
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(_cardRadius),
                     boxShadow: [
                       BoxShadow(
-                        color: onSurface.withOpacity(0.04),
+                        color: onSurface.withValues(alpha: 0.04),
                         blurRadius: 48,
                         spreadRadius: -4,
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+                  padding: EdgeInsets.symmetric(horizontal: _isCompact ? 20 : 32, vertical: _isCompact ? 28 : 40),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -421,22 +439,28 @@ class _AuthScreenState extends State<AuthScreen> {
                       TextFormField(
                         controller: _firstNameController,
                         decoration: _buildInputDecoration('First Name'),
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.givenName],
                         validator: (v) => _validateName(v, 'first name'),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: _isCompact ? 16 : 20),
                       TextFormField(
                         controller: _lastNameController,
                         decoration: _buildInputDecoration('Last Name'),
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.familyName],
                         validator: (v) => _validateName(v, 'last name'),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: _isCompact ? 16 : 20),
                       TextFormField(
                         controller: _emailController,
                         decoration: _buildInputDecoration('Email Address'),
                         keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.email],
                         validator: _validateEmail,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: _isCompact ? 16 : 20),
                       TextFormField(
                         controller: _passwordController,
                         decoration: _buildInputDecoration(
@@ -450,12 +474,21 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                         obscureText: !_showPassword,
+                        textInputAction: TextInputAction.done,
+                        autofillHints: const [AutofillHints.newPassword],
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        onFieldSubmitted: (_) {
+                          if (!_isLoading) {
+                            _submitSignup();
+                          }
+                        },
                         validator: _validatePassword,
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: _isCompact ? 24 : 32),
                       // Primary button
                       SizedBox(
-                        height: 56,
+                        height: _buttonHeight,
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
@@ -466,7 +499,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
-                                color: primary.withOpacity(0.3),
+                                color: primary.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -503,7 +536,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       // Secondary action
                       Center(
                         child: TextButton(
-                          onPressed: () => setState(() => _authState = AuthState.login),
+                          onPressed: () => _setAuthState(AuthState.login),
                           child: RichText(
                             text: const TextSpan(
                               text: "Already have an account? ",
@@ -550,7 +583,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: primaryFixed.withOpacity(0.15),
+                      color: primaryFixed.withValues(alpha: 0.15),
                     ),
                   ),
                 ),
@@ -562,7 +595,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 400,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFCFE6F2).withOpacity(0.2),
+                      color: const Color(0xFFCFE6F2).withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -577,20 +610,20 @@ class _AuthScreenState extends State<AuthScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(_outerPadding),
                 child: Container(
                   decoration: BoxDecoration(
                     color: surfaceContainerLowest,
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(_cardRadius),
                     boxShadow: [
                       BoxShadow(
-                        color: onSurface.withOpacity(0.04),
+                        color: onSurface.withValues(alpha: 0.04),
                         blurRadius: 48,
                         spreadRadius: -4,
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+                  padding: EdgeInsets.symmetric(horizontal: _isCompact ? 20 : 32, vertical: _isCompact ? 28 : 40),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -599,9 +632,11 @@ class _AuthScreenState extends State<AuthScreen> {
                         controller: _emailController,
                         decoration: _buildInputDecoration('Email Address'),
                         keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.email],
                         validator: _validateEmail,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: _isCompact ? 16 : 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -619,6 +654,15 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                               ),
                               obscureText: !_showPassword,
+                              textInputAction: TextInputAction.done,
+                              autofillHints: const [AutofillHints.password],
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              onFieldSubmitted: (_) {
+                                if (!_isLoading) {
+                                  _submitLogin();
+                                }
+                              },
                               validator: _validatePassword,
                             ),
                           ),
@@ -639,7 +683,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: _isCompact ? 16 : 20),
                       // Primary button
                       SizedBox(
                         height: 56,
@@ -653,7 +697,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
-                                color: primary.withOpacity(0.3),
+                                color: primary.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -686,92 +730,27 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Divider
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              color: outlineVariant.withOpacity(0.3),
-                              thickness: 1,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'OR CONTINUE WITH',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: secondary,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              color: outlineVariant.withOpacity(0.3),
-                              thickness: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Social buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: surfaceContainerLow,
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              child: TextButton(
-                                onPressed: () {},
-                                child: const Icon(Icons.abc, size: 22),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: surfaceContainerLow,
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              child: TextButton(
-                                onPressed: () {},
-                                child: const Icon(Icons.apple, size: 22),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Footer message
+                      SizedBox(height: _isCompact ? 20 : 24),
                       Center(
-                        child: RichText(
-                          text: const TextSpan(
-                            text: 'New to WellQueue? ',
-                            style: TextStyle(color: secondary, fontSize: 14),
-                            children: [
-                              TextSpan(
-                                text: 'Create an account',
-                                style: TextStyle(
-                                  color: primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
+                        child: TextButton(
+                          onPressed: () => _setAuthState(AuthState.signup),
+                          child: RichText(
+                            text: const TextSpan(
+                              text: 'New to WellQueue? ',
+                              style: TextStyle(color: secondary, fontSize: 14),
+                              children: [
+                                TextSpan(
+                                  text: 'Create an account',
+                                  style: TextStyle(
+                                    color: primary,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () => setState(() => _authState = AuthState.signup),
-                        child: const Text(''),
                       ),
                     ],
                   ),
@@ -789,11 +768,19 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: surface,
       body: SafeArea(
-        child: switch (_authState) {
-          AuthState.initial => _buildInitialView(),
-          AuthState.signup => _buildSignupView(),
-          AuthState.login => _buildLoginView(),
-        },
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          child: KeyedSubtree(
+            key: ValueKey(_authState),
+            child: switch (_authState) {
+              AuthState.initial => _buildInitialView(),
+              AuthState.signup => _buildSignupView(),
+              AuthState.login => _buildLoginView(),
+            },
+          ),
+        ),
       ),
     );
   }

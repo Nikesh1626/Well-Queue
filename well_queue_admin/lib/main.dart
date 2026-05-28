@@ -17,7 +17,7 @@ class AdminApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<AdminAuthServiceBase>(
       create: (_) => AdminAuthService()..initialize(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -34,7 +34,7 @@ class _AdminRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AdminAuthService>();
+    final auth = context.watch<AdminAuthServiceBase>();
     if (!auth.isAuthenticated) return const AdminLoginScreen();
     return const AdminDashboardScreen();
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../../../core/services/auth_service.dart';
 
@@ -26,6 +28,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   static const Color onSurface = Color(0xFF191c1d);
   static const Color secondary = Color(0xFF4c616c);
 
+  bool get _isCompact => MediaQuery.sizeOf(context).width < 390;
+
   @override
   void dispose() {
     _email.dispose();
@@ -45,18 +49,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       filled: true,
       fillColor: surfaceContainerLow,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_isCompact ? 14 : 16),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_isCompact ? 14 : 16),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_isCompact ? 14 : 16),
         borderSide: const BorderSide(color: primaryFixed, width: 2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: _isCompact ? 14 : 16),
       suffixIcon: suffixIcon,
     );
   }
@@ -78,7 +82,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     
-    final auth = context.read<AdminAuthService>();
+    final auth = context.read<AdminAuthServiceBase>();
     final ok = await auth.signIn(
       _email.text.trim(),
       _password.text,
@@ -94,7 +98,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AdminAuthService>();
+    final auth = context.watch<AdminAuthServiceBase>();
     
     return Scaffold(
       backgroundColor: surface,
@@ -136,13 +140,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(_isCompact ? 16 : 24),
                 child: Form(
                   key: _formKey,
                   child: Container(
                     decoration: BoxDecoration(
                       color: surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(32),
+                      borderRadius: BorderRadius.circular(_isCompact ? 24 : 32),
                       boxShadow: [
                         BoxShadow(
                           color: onSurface.withAlpha((0.04 * 255).toInt()),
@@ -151,48 +155,50 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                    padding: EdgeInsets.symmetric(horizontal: _isCompact ? 20 : 32, vertical: _isCompact ? 30 : 48),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Brand header
                         Container(
-                          width: 64,
-                          height: 64,
+                          width: _isCompact ? 56 : 64,
+                          height: _isCompact ? 56 : 64,
                           decoration: BoxDecoration(
                             color: primaryContainer,
-                            borderRadius: BorderRadius.circular(32),
+                            borderRadius: BorderRadius.circular(_isCompact ? 28 : 32),
                           ),
-                          child: const Icon(Icons.admin_panel_settings, size: 32, color: Colors.white),
+                          child: Icon(Icons.local_hospital, size: _isCompact ? 28 : 32, color: Colors.white),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: _isCompact ? 18 : 24),
                         Text(
                           'WellQueue Admin',
-                          style: const TextStyle(
-                            fontSize: 28,
+                          style: TextStyle(
+                            fontSize: _isCompact ? 24 : 28,
                             fontWeight: FontWeight.w800,
                             color: onSurface,
                             letterSpacing: -0.5,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Clinic Administration Portal',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: _isCompact ? 14 : 16,
                             color: secondary,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: _isCompact ? 24 : 32),
                         // Email field
                         TextFormField(
                           controller: _email,
                           decoration: _buildInputDecoration('Email Address'),
                           keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.email],
                           validator: _validateEmail,
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: _isCompact ? 16 : 20),
                         // Password field
                         TextFormField(
                           controller: _password,
@@ -207,29 +213,39 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                             ),
                           ),
                           obscureText: !_showPassword,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.password],
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          onFieldSubmitted: (_) {
+                            if (!auth.loading) {
+                              _submit();
+                            }
+                          },
                           validator: _validatePassword,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: _isCompact ? 12 : 16),
                         // Remember device checkbox
                         SizedBox(
-                          height: 36,
+                          height: _isCompact ? 34 : 36,
                           child: CheckboxListTile(
+                            visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                             contentPadding: EdgeInsets.zero,
                             value: _rememberDevice,
                             onChanged: (v) => setState(() => _rememberDevice = v ?? true),
-                            title: const Text(
+                            title: Text(
                               'Remember this device for 30 days',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: _isCompact ? 13 : 14,
                                 color: onSurface,
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: _isCompact ? 20 : 24),
                         // Primary button
                         SizedBox(
-                          height: 56,
+                          height: _isCompact ? 52 : 56,
                           child: Container(
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
@@ -246,45 +262,49 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                                 ),
                               ],
                             ),
-                            child: ElevatedButton(
-                              onPressed: auth.loading ? null : _submit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
+                            child: Semantics(
+                              button: true,
+                              label: 'Sign in to admin account',
+                              child: ElevatedButton(
+                                onPressed: auth.loading ? null : _submit,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                ),
+                                child: auth.loading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation(Colors.white),
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Sign In',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
-                              child: auth.loading
-                                  ? const SizedBox(
-                                      height: 24,
-                                      width: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation(Colors.white),
-                                      ),
-                                    )
-                                  : const Text(
-                                      'Sign In',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                      ),
-                                    ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: _isCompact ? 20 : 24),
                         // Footer message
                         Center(
                           child: Column(
                             children: [
-                              const Text(
+                              Text(
                                 'New to WellQueue Administration?',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: _isCompact ? 13 : 14,
                                   color: secondary,
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: _isCompact ? 10 : 12),
                               TextButton(
                                 onPressed: () => Navigator.of(context).push(
                                   MaterialPageRoute(builder: (_) => const _InlineAdminSignupScreen()),
@@ -327,9 +347,17 @@ class _InlineAdminSignupScreenState extends State<_InlineAdminSignupScreen> {
   final _lastName = TextEditingController();
   final _clinicName = TextEditingController();
   final _clinicAddress = TextEditingController();
+  final _latitude = TextEditingController();
+  final _longitude = TextEditingController();
   final _clinicEmail = TextEditingController();
   final _password = TextEditingController();
   final _confirmPassword = TextEditingController();
+  bool _detectingLocation = false;
+  bool _geocodingAddress = false;
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
+
+  bool get _isCompact => MediaQuery.sizeOf(context).width < 390;
 
   @override
   void dispose() {
@@ -337,23 +365,121 @@ class _InlineAdminSignupScreenState extends State<_InlineAdminSignupScreen> {
     _lastName.dispose();
     _clinicName.dispose();
     _clinicAddress.dispose();
+    _latitude.dispose();
+    _longitude.dispose();
     _clinicEmail.dispose();
     _password.dispose();
     _confirmPassword.dispose();
     super.dispose();
   }
 
+  String? _validateCoordinate(String? value, double min, double max, String label) {
+    if (value == null || value.trim().isEmpty) return '$label is required';
+    final parsed = double.tryParse(value.trim());
+    if (parsed == null) return 'Enter a valid $label';
+    if (parsed < min || parsed > max) return '$label must be between $min and $max';
+    return null;
+  }
+
+  Future<void> _detectLocation() async {
+    setState(() => _detectingLocation = true);
+    try {
+      final enabled = await Geolocator.isLocationServiceEnabled();
+      if (!enabled) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Enable location services and try again.')),
+        );
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location permission denied.')),
+        );
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      _latitude.text = pos.latitude.toStringAsFixed(6);
+      _longitude.text = pos.longitude.toStringAsFixed(6);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to detect location: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _detectingLocation = false);
+      }
+    }
+  }
+
+  Future<void> _geocodeAddress() async {
+    final address = _clinicAddress.text.trim();
+    if (address.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter clinic address to locate.')),
+      );
+      return;
+    }
+
+    setState(() => _geocodingAddress = true);
+    try {
+      final locations = await locationFromAddress(address);
+      if (locations.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to locate this address.')),
+        );
+        return;
+      }
+
+      final location = locations.first;
+      _latitude.text = location.latitude.toStringAsFixed(6);
+      _longitude.text = location.longitude.toStringAsFixed(6);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to locate address: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _geocodingAddress = false);
+      }
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final auth = context.read<AdminAuthService>();
+    final latitude = double.tryParse(_latitude.text.trim());
+    final longitude = double.tryParse(_longitude.text.trim());
+    if (latitude == null || longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please provide a valid clinic location.')),
+      );
+      return;
+    }
+
+    final auth = context.read<AdminAuthServiceBase>();
     final ok = await auth.createAdminProfile(
       firstName: _firstName.text.trim(),
       lastName: _lastName.text.trim(),
       clinicName: _clinicName.text.trim(),
       clinicAddress: _clinicAddress.text.trim(),
-      latitude: 0,
-      longitude: 0,
+      latitude: latitude,
+      longitude: longitude,
       clinicEmail: _clinicEmail.text.trim(),
       password: _password.text,
     );
@@ -373,35 +499,166 @@ class _InlineAdminSignupScreenState extends State<_InlineAdminSignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AdminAuthService>();
+    final auth = context.watch<AdminAuthServiceBase>();
     return Scaffold(
       appBar: AppBar(title: const Text('Create Admin Profile')),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(_isCompact ? 12 : 16),
           children: [
-            TextFormField(controller: _firstName, decoration: const InputDecoration(labelText: 'First Name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'First name is required' : null),
-            const SizedBox(height: 12),
-            TextFormField(controller: _lastName, decoration: const InputDecoration(labelText: 'Last Name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Last name is required' : null),
-            const SizedBox(height: 12),
-            TextFormField(controller: _clinicName, decoration: const InputDecoration(labelText: 'Clinic Name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Clinic name is required' : null),
-            const SizedBox(height: 12),
-            TextFormField(controller: _clinicAddress, decoration: const InputDecoration(labelText: 'Clinic Address'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Clinic address is required' : null),
-            const SizedBox(height: 12),
-            TextFormField(controller: _clinicEmail, decoration: const InputDecoration(labelText: 'Clinic Email'), validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Email is required';
-              final okEmail = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v.trim());
-              return okEmail ? null : 'Please enter a valid email';
-            }),
-            const SizedBox(height: 12),
-            TextFormField(controller: _password, obscureText: true, decoration: const InputDecoration(labelText: 'Password'), validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null),
-            const SizedBox(height: 12),
-            TextFormField(controller: _confirmPassword, obscureText: true, decoration: const InputDecoration(labelText: 'Confirm Password'), validator: (v) => v != _password.text ? 'Passwords do not match' : null),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: auth.loading ? null : _submit,
-              child: Text(auth.loading ? 'Creating...' : 'Create Admin Account'),
+            Container(
+              padding: EdgeInsets.all(_isCompact ? 14 : 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(_isCompact ? 16 : 20),
+                border: Border.all(color: const Color(0xFFE3ECEB)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Create clinic admin account', style: TextStyle(fontSize: _isCompact ? 16 : 18, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 4),
+                  Text('Fill profile, clinic details, and location to complete onboarding.'),
+                ],
+              ),
+            ),
+            SizedBox(height: _isCompact ? 12 : 14),
+            const Text('Owner Details', style: TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _firstName,
+              decoration: const InputDecoration(labelText: 'First Name'),
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.givenName],
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'First name is required' : null,
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            TextFormField(
+              controller: _lastName,
+              decoration: const InputDecoration(labelText: 'Last Name'),
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.familyName],
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'Last name is required' : null,
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            const Text('Clinic Details', style: TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _clinicName,
+              decoration: const InputDecoration(labelText: 'Clinic Name'),
+              textInputAction: TextInputAction.next,
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'Clinic name is required' : null,
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            TextFormField(
+              controller: _clinicAddress,
+              decoration: const InputDecoration(labelText: 'Clinic Address'),
+              textInputAction: TextInputAction.next,
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'Clinic address is required' : null,
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Clinic Location',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: _isCompact ? 13 : 14),
+                ),
+                Wrap(
+                  spacing: _isCompact ? 4 : 8,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _detectingLocation ? null : _detectLocation,
+                      icon: const Icon(Icons.my_location, size: 18),
+                      label: Text(_detectingLocation ? 'Detecting...' : 'Use GPS'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _geocodingAddress ? null : _geocodeAddress,
+                      icon: const Icon(Icons.map_outlined, size: 18),
+                      label: Text(_geocodingAddress ? 'Locating...' : 'From Address'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            TextFormField(
+              controller: _latitude,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+              decoration: const InputDecoration(labelText: 'Latitude'),
+              textInputAction: TextInputAction.next,
+              validator: (v) => _validateCoordinate(v, -90, 90, 'Latitude'),
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            TextFormField(
+              controller: _longitude,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+              decoration: const InputDecoration(labelText: 'Longitude'),
+              textInputAction: TextInputAction.next,
+              validator: (v) => _validateCoordinate(v, -180, 180, 'Longitude'),
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            TextFormField(
+              controller: _clinicEmail,
+              decoration: const InputDecoration(labelText: 'Clinic Email'),
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.email],
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return 'Email is required';
+                final okEmail = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v.trim());
+                return okEmail ? null : 'Please enter a valid email';
+              },
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            TextFormField(
+              controller: _password,
+              obscureText: !_showPassword,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.newPassword],
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                suffixIcon: IconButton(
+                  onPressed: () => setState(() => _showPassword = !_showPassword),
+                  icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off),
+                ),
+              ),
+              validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null,
+            ),
+            SizedBox(height: _isCompact ? 10 : 12),
+            TextFormField(
+              controller: _confirmPassword,
+              obscureText: !_showConfirmPassword,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.password],
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                suffixIcon: IconButton(
+                  onPressed: () => setState(() => _showConfirmPassword = !_showConfirmPassword),
+                  icon: Icon(_showConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                ),
+              ),
+              onFieldSubmitted: (_) {
+                if (!auth.loading) {
+                  _submit();
+                }
+              },
+              validator: (v) => v != _password.text ? 'Passwords do not match' : null,
+            ),
+            SizedBox(height: _isCompact ? 16 : 20),
+            Semantics(
+              button: true,
+              label: 'Create admin account',
+              child: ElevatedButton(
+                onPressed: auth.loading ? null : _submit,
+                style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(_isCompact ? 48 : 52)),
+                child: Text(auth.loading ? 'Creating...' : 'Create Admin Account'),
+              ),
             ),
           ],
         ),

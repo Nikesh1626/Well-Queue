@@ -5,6 +5,7 @@ import '../../../core/services/queue_service.dart';
 import '../../../core/services/geofencing_service.dart';
 import '../../../core/services/webhook_service.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../myqueue/presentation/check_in_screen.dart';
 
 class ClinicDetailScreen extends StatefulWidget {
@@ -21,8 +22,12 @@ class ClinicDetailScreen extends StatefulWidget {
 
 class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
   bool _enableGeofence = false;
+  bool _isJoining = false;
+  bool _isCalling = false;
 
   Future<void> _joinQueue() async {
+    if (_isJoining) return;
+
     final authService = context.read<AuthService>();
     final queueService = context.read<QueueService>();
 
@@ -33,6 +38,8 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
       return;
     }
 
+    setState(() => _isJoining = true);
+
     final success = await queueService.joinQueue(
       clinicId: widget.clinic.id,
       clinicName: widget.clinic.name,
@@ -40,6 +47,7 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
     );
 
     if (mounted) {
+      setState(() => _isJoining = false);
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Joined queue successfully')),
@@ -66,6 +74,8 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
   }
 
   Future<void> _triggerAICall() async {
+    if (_isCalling) return;
+
     final authService = context.read<AuthService>();
     final user = authService.currentUser;
 
@@ -77,6 +87,7 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
     }
 
     try {
+      setState(() => _isCalling = true);
       await WebhookService.triggerAICall(
         userName: user.fullName,
         userPhone: user.phone ?? 'N/A',
@@ -95,20 +106,26 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
           SnackBar(content: Text('Error: $e')),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isCalling = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.sizeOf(context).width < 390;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Clinic Details')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isCompact ? 12 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 230,
+              height: isCompact ? 200 : 230,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
@@ -118,29 +135,27 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
                   colors: [Color(0xFF9FD1D3), Color(0xFF567C84)],
                 ),
               ),
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(isCompact ? 14 : 20),
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Row(
                   children: [
-                    Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(29),
-                      ),
-                      child: const Icon(Icons.call, color: Color(0xFF00695C)),
+                    _heroAction(
+                      icon: Icons.call,
+                      label: 'Call clinic',
+                      onTap: _triggerAICall,
+                      compact: isCompact,
                     ),
                     const SizedBox(width: 12),
-                    Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(29),
-                      ),
-                      child: const Icon(Icons.near_me, color: Color(0xFF00695C)),
+                    _heroAction(
+                      icon: Icons.near_me,
+                      label: 'Directions',
+                      compact: isCompact,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Directions action coming soon')),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -153,21 +168,36 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
                 Expanded(
                   child: Text(
                     widget.clinic.name,
-                    style: const TextStyle(fontSize: 46, fontWeight: FontWeight.w700, height: 1.05),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: isCompact ? 34 : 42, fontWeight: FontWeight.w700, height: 1.05),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 10 : 14, vertical: isCompact ? 8 : 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFFD7EAF6),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text('Open until 8:00 PM', style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text('Open until 8:00 PM', style: TextStyle(fontWeight: FontWeight.w600, fontSize: isCompact ? 12 : 14)),
                 )
               ],
             ),
             const SizedBox(height: 8),
-            Text(widget.clinic.address, style: const TextStyle(fontSize: 22, color: Color(0xFF536872))),
+            Text(
+              widget.clinic.address,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: isCompact ? 16 : 20, color: const Color(0xFF536872)),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                _metaChip(Icons.place_outlined, '${(widget.clinic.distance ?? 0).toStringAsFixed(1)} km away'),
+                const SizedBox(width: 8),
+                _metaChip(Icons.star_rounded, widget.clinic.rating.toStringAsFixed(1)),
+              ],
+            ),
             const SizedBox(height: 14),
             Wrap(
               spacing: 8,
@@ -180,7 +210,7 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
 
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(isCompact ? 16 : 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 gradient: const LinearGradient(
@@ -196,7 +226,7 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     '${widget.clinic.waitTimeMinutes} min',
-                    style: const TextStyle(fontSize: 62, color: Colors.white, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: isCompact ? 50 : 62, color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -205,35 +235,58 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
 
             Card(
               color: Colors.white,
-              child: CheckboxListTile(
-                title: const Text('Join queue when I arrive (50m radius)'),
-                subtitle: const Text('Enable geofencing'),
-                value: _enableGeofence,
-                onChanged: (value) {
-                  setState(() {
-                    _enableGeofence = value ?? false;
-                  });
-                },
+              child: Semantics(
+                label: 'Enable geofence queue join',
+                hint: 'When enabled, queue monitoring starts automatically near clinic',
+                child: CheckboxListTile(
+                  title: const Text('Join queue when I arrive (50m radius)'),
+                  subtitle: const Text('Enable geofencing'),
+                  value: _enableGeofence,
+                  onChanged: (value) {
+                    setState(() {
+                      _enableGeofence = value ?? false;
+                    });
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 24),
 
             SizedBox(
               width: double.infinity,
-              height: 58,
-              child: ElevatedButton(
-                onPressed: _joinQueue,
-                child: const Text('Join Queue'),
+              height: isCompact ? 54 : 58,
+              child: Semantics(
+                button: true,
+                label: 'Join queue at this clinic',
+                child: ElevatedButton(
+                  onPressed: _isJoining ? null : _joinQueue,
+                  child: _isJoining
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        )
+                      : const Text('Join Queue'),
+                ),
               ),
             ),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              height: 58,
+              height: isCompact ? 54 : 58,
               child: ElevatedButton.icon(
-                onPressed: _triggerAICall,
-                icon: const Icon(Icons.phone),
-                label: const Text('Call AI Booking Agent'),
+                onPressed: _isCalling ? null : _triggerAICall,
+                icon: _isCalling
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white)),
+                      )
+                    : const Icon(Icons.phone),
+                label: Text(_isCalling ? 'Calling...' : 'Call AI Booking Agent'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0B7A3C),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -241,6 +294,52 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _metaChip(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSoft,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppTheme.primaryDark),
+          const SizedBox(width: 5),
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryDark),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool compact = false,
+  }) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(29),
+        onTap: onTap,
+        child: Container(
+          width: compact ? 50 : 58,
+          height: compact ? 50 : 58,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(compact ? 25 : 29),
+          ),
+          child: Icon(icon, color: const Color(0xFF00695C), size: compact ? 20 : 24),
         ),
       ),
     );

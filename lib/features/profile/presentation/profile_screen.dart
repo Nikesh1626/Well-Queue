@@ -43,6 +43,8 @@ class ProfileScreen extends StatelessWidget {
     if (user == null) {
       return const Center(child: Text('No user data'));
     }
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 390;
 
     final initials = '${user.firstName.isNotEmpty ? user.firstName[0] : 'U'}${user.lastName.isNotEmpty ? user.lastName[0] : ''}'.toUpperCase();
 
@@ -50,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Row(
           children: [
-            Icon(Icons.spa_rounded, color: Color(0xFF00695C)),
+            Icon(Icons.local_hospital, color: Color(0xFF00695C)),
             SizedBox(width: 8),
             Text('WellQueue'),
           ],
@@ -60,27 +62,47 @@ class ProfileScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            SizedBox(height: isCompact ? 16 : 20),
             CircleAvatar(
-              radius: 62,
+              radius: isCompact ? 54 : 62,
               backgroundColor: Colors.white,
               child: Text(
                 initials,
-                style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w700, color: Color(0xFF00695C)),
+                style: TextStyle(fontSize: isCompact ? 34 : 42, fontWeight: FontWeight.w700, color: const Color(0xFF00695C)),
               ),
             ),
             const SizedBox(height: 14),
-            Text(
-              user.fullName,
-              style: const TextStyle(fontSize: 52, fontWeight: FontWeight.w700),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                user.fullName,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: isCompact ? 34 : 42, fontWeight: FontWeight.w700, height: 1.05),
+              ),
             ),
             const SizedBox(height: 4),
-            Text(user.email, style: const TextStyle(color: Color(0xFF5A7078), fontSize: 17)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                user.email,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: const Color(0xFF5A7078), fontSize: isCompact ? 15 : 17),
+              ),
+            ),
             const SizedBox(height: 22),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Card(
                 color: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: Color(0xFFE1EAEE)),
+                ),
                 child: Column(
                   children: [
                     ListTile(
@@ -105,7 +127,10 @@ class ProfileScreen extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _handleLogout(context),
                   icon: const Icon(Icons.logout),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD44E4E)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD44E4E),
+                    minimumSize: Size.fromHeight(isCompact ? 46 : 50),
+                  ),
                   label: const Text('Sign Out'),
                 ),
               ),

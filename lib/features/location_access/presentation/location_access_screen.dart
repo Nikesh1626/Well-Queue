@@ -105,41 +105,37 @@ class LocationAccessScreen extends StatelessWidget {
     );
   }
 
-  void _enterLocationManually(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Manual location entry coming soon.')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.sizeOf(context).width < 390;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8F8),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(isCompact ? 16 : 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              const Row(
+              SizedBox(height: isCompact ? 10 : 20),
+              Row(
                 children: [
-                  Icon(Icons.spa_rounded, color: _primaryColor, size: 30),
-                  SizedBox(width: 10),
+                  Icon(Icons.local_hospital, color: _primaryColor, size: isCompact ? 24 : 30),
+                  SizedBox(width: isCompact ? 8 : 10),
                   Text(
                     'WellQueue',
-                    style: TextStyle(fontSize: 34, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: isCompact ? 28 : 34, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: isCompact ? 12 : 20),
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(isCompact ? 16 : 24),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(isCompact ? 24 : 32),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.05),
@@ -153,34 +149,34 @@ class LocationAccessScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
-                        height: 170,
+                        height: isCompact ? 138 : 170,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(isCompact ? 18 : 24),
                           color: const Color(0xFFEAF2F1),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.map_outlined,
-                          size: 68,
+                          size: isCompact ? 56 : 68,
                           color: Color(0xFF7AA7A0),
                         ),
                       ),
-                      const SizedBox(height: 26),
-                      const Text(
+                      SizedBox(height: isCompact ? 18 : 26),
+                      Text(
                         'Find Care Nearby',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 40,
+                          fontSize: isCompact ? 32 : 40,
                           fontWeight: FontWeight.w700,
                           height: 1.05,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      SizedBox(height: isCompact ? 12 : 16),
+                      Text(
                         'WellQueue uses your location to find clinics with the shortest wait times around you.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 17, color: Color(0xFF536872), height: 1.35),
+                        style: TextStyle(fontSize: isCompact ? 15 : 17, color: const Color(0xFF536872), height: 1.35),
                       ),
-                      const SizedBox(height: 28),
+                      SizedBox(height: isCompact ? 20 : 28),
                       ElevatedButton(
                         onPressed: () => _enableLocationAccess(context),
                         style: ElevatedButton.styleFrom(
@@ -188,32 +184,32 @@ class LocationAccessScreen extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
-                          minimumSize: const Size(double.infinity, 58),
+                          minimumSize: Size(double.infinity, isCompact ? 52 : 58),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Allow Location',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                          style: TextStyle(fontSize: isCompact ? 18 : 20, fontWeight: FontWeight.w700),
                         ),
                       ),
-                      const SizedBox(height: 14),
-                      ,
+                      SizedBox(height: isCompact ? 12 : 14),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(vertical: isCompact ? 12 : 14, horizontal: isCompact ? 8 : 0),
                         decoration: BoxDecoration(
                           color: const Color(0xFFEFF3F4),
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(isCompact ? 18 : 24),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.lock, color: Color(0xFF536872)),
-                            SizedBox(width: 10),
+                            const Icon(Icons.lock, color: Color(0xFF536872)),
+                            SizedBox(width: isCompact ? 8 : 10),
                             Text(
                               'YOUR DATA IS PRIVATE & SECURE',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF536872),
+                                fontSize: isCompact ? 11 : 13,
                               ),
                             ),
                           ],

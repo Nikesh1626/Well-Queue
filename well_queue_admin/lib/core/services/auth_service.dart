@@ -2,7 +2,35 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AdminAuthService extends ChangeNotifier {
+abstract class AdminAuthServiceBase extends ChangeNotifier {
+  bool get loading;
+  bool get initializing;
+  String? get error;
+  Map<String, dynamic>? get profile;
+  String? get clinicId;
+  bool get isAuthenticated;
+
+  Future<void> initialize();
+  Future<bool> signIn(
+    String email,
+    String password, {
+    required bool rememberDevice,
+  });
+  Future<void> signOut();
+  Future<void> loadProfile();
+  Future<bool> createAdminProfile({
+    required String firstName,
+    required String lastName,
+    required String clinicName,
+    required String clinicAddress,
+    required double latitude,
+    required double longitude,
+    required String clinicEmail,
+    required String password,
+  });
+}
+
+class AdminAuthService extends ChangeNotifier implements AdminAuthServiceBase {
   final _client = Supabase.instance.client;
   static const _rememberKey = 'remember_device_30_days';
   static const _rememberAtKey = 'remember_device_at';
@@ -11,12 +39,14 @@ class AdminAuthService extends ChangeNotifier {
   bool _initializing = true;
   String? _error;
   Map<String, dynamic>? _profile;
+  String? _clinicId;
 
   bool get loading => _loading;
   bool get initializing => _initializing;
   String? get error => _error;
   User? get user => _client.auth.currentUser;
   Map<String, dynamic>? get profile => _profile;
+  String? get clinicId => _clinicId;
   bool get isAuthenticated => user != null;
 
   Future<void> initialize() async {
@@ -80,7 +110,33 @@ class AdminAuthService extends ChangeNotifier {
 
     final row = await _client.from('users').select().eq('id', uid).maybeSingle();
     _profile = row;
+    _clinicId = await _loadClinicId(uid);
     notifyListeners();
+  }
+
+  Future<String?> _loadClinicId(String uid) async {
+    try {
+      final adminRow = await _client
+          .from('admin_users')
+          .select('clinic_id')
+          .eq('user_id', uid)
+          .maybeSingle();
+
+      final adminClinicId = adminRow?['clinic_id'] as String?;
+      if (adminClinicId != null && adminClinicId.isNotEmpty) {
+        return adminClinicId;
+      }
+
+      final clinicRow = await _client
+          .from('clinics')
+          .select('id')
+          .eq('admin_id', uid)
+          .maybeSingle();
+
+      return clinicRow?['id'] as String?;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<bool> createAdminProfile({
@@ -201,6 +257,7 @@ class AdminAuthService extends ChangeNotifier {
     await prefs.remove(_rememberKey);
     await prefs.remove(_rememberAtKey);
     _profile = null;
+    _clinicId = null;
     notifyListeners();
   }
 
