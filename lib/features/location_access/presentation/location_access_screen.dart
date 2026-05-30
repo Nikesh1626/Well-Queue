@@ -161,6 +161,18 @@ class LocationAccessScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: isCompact ? 18 : 26),
+                      // Onboarding step indicator
+                      Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF97f3e2).withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text('Step 2 of 2', style: TextStyle(fontSize: isCompact ? 12 : 13, color: _primaryColor, fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                      SizedBox(height: isCompact ? 12 : 16),
                       Text(
                         'Find Care Nearby',
                         textAlign: TextAlign.center,
@@ -187,7 +199,7 @@ class LocationAccessScreen extends StatelessWidget {
                           minimumSize: Size(double.infinity, isCompact ? 52 : 58),
                         ),
                         child: Text(
-                          'Allow Location',
+                          'Allow Location — Step 2',
                           style: TextStyle(fontSize: isCompact ? 18 : 20, fontWeight: FontWeight.w700),
                         ),
                       ),

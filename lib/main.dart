@@ -6,7 +6,9 @@ import 'core/services/queue_service.dart';
 import 'core/services/clinic_service.dart';
 import 'core/services/geofencing_service.dart';
 import 'core/theme/app_theme.dart';
+import 'features/onboarding/presentation/onboarding_screen.dart';
 import 'features/auth/presentation/auth_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'features/location_access/presentation/location_access_screen.dart';
 
 void main() async {
@@ -58,6 +60,7 @@ class _AppRouter extends StatefulWidget {
 }
 
 class _AppRouterState extends State<_AppRouter> {
+  bool? _seenOnboarding;
   @override
   void initState() {
     super.initState();
@@ -65,6 +68,12 @@ class _AppRouterState extends State<_AppRouter> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthService>().initialize();
     });
+    // Load persistent onboarding flag
+    () async {
+      final prefs = await SharedPreferences.getInstance();
+      final seen = prefs.getBool('seen_onboarding') ?? false;
+      setState(() => _seenOnboarding = seen);
+    }();
   }
 
   @override
@@ -80,9 +89,12 @@ class _AppRouterState extends State<_AppRouter> {
       );
     }
 
-    // No user logged in - show auth screen
+    // No user logged in - show onboarding first unless already seen
     if (authService.currentUser == null) {
-      return const AuthScreen();
+      if (_seenOnboarding == null) {
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
+      return _seenOnboarding! ? const AuthScreen() : const OnboardingScreen();
     }
 
     return const LocationAccessScreen();

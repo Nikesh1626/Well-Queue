@@ -261,109 +261,31 @@ class _AuthScreenState extends State<AuthScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildAuthHeader('WellQueue', 'Your restorative care journey begins here.'),
-                    SizedBox(height: _isCompact ? 26 : 40),
-                    // Feature preview card
-                    Container(
-                      padding: EdgeInsets.all(_isCompact ? 18 : 24),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment(0, -1),
-                          end: Alignment(1, 1),
-                          colors: [primary, primaryContainer],
-                        ),
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Real-time wait times',
-                            style: TextStyle(
-                              fontSize: _isCompact ? 13 : 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.95),
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.hourglass_bottom, color: primary, size: 28),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'Approx. 4 mins',
-                                  style: TextStyle(
-                                    fontSize: _isCompact ? 19 : 22,
-                                    fontWeight: FontWeight.w700,
-                                    color: onSurface,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: _isCompact ? 26 : 40),
-                    // Primary button with gradient
-                    SizedBox(
-                      height: _buttonHeight,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment(0, -1),
-                            end: Alignment(1, 1),
-                            colors: [primary, primaryContainer],
-                          ),
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                                color: primary.withValues(alpha: 0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () => _setAuthState(AuthState.signup),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                          ),
-                          child: const Text(
-                            'Get Started',
-                              style: TextStyle(
-                                fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Secondary button
-                    TextButton(
-                      onPressed: () => _setAuthState(AuthState.login),
-                      child: const Text(
-                        'Log In',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: primary,
-                        ),
-                      ),
-                    ),
+                                    SizedBox(height: _isCompact ? 20 : 28),
+                                    // Primary CTA
+                                    SizedBox(
+                                      height: _buttonHeight,
+                                      child: ElevatedButton(
+                                        onPressed: () => _setAuthState(AuthState.signup),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primary,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        ),
+                                        child: const Text(
+                                          'Get Started',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    // Secondary button
+                                    TextButton(
+                                      onPressed: () => _setAuthState(AuthState.login),
+                                      child: const Text(
+                                        'Log In',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: primary),
+                                      ),
+                                    ),
                   ],
                 ),
               ),
